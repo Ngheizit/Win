@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>分幅矢量数据的下载及基于arcpy的分幅数据批量处理</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/BlogsListModel.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/BlogShow.css"/>
+		<link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dojox/layout/resources/FloatingPane.css" />
+		<link rel="stylesheet" type="text/css" href="../css/BlogCSS.css"/>
+		<link rel="stylesheet" type="text/css" href="css/BlogsListModel.css"/>
+		<!--导入页面CSS模板-->
+		<link rel="stylesheet" type="text/css" href="../css/PageTemplate.css"/>
+		
+		<!--
+			BorderContainer容器
+				- 每BorderContainer实例可以至多允许包含5个不同区域
+					-- 上、下、左、右、中
+					-- 若某个区域需进一步分解，则将BorderContainer中的一个区域设置为另一个BorderContainer实例
+				- 通过“design”属性控制其子元素的位置
+					--属性值：
+						--- headline
+							---- 上下两个区域优先设置，且宽度与整个BorderContainer的宽度相同
+							---- 上中下结构
+						--- sidebar
+							---- 左右两个区域优先设置，且高度与整个BorderContainer的高度相同
+							---- 左中右结构
+				- 需要设定宽width 高height (利用CSS样式即可)
+				- 左右子节点可设置宽度
+				- 上下子节点可设置高度
+				- 属性slitter 设置是否可拖拽子节点以修改尺寸
+		-->
+		
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/tundra/tundra.css"/>
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/esri/css/esri.css"/>
+		
+		<style type="text/css">
+			html,body,#main{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			dojoConfig = {
+				isDebug: true,
+				async: true
+			};
+		</script>
+		
+		<script src="http://js.arcgis.com/3.9/" type="text/javascript"></script>
+		
+		<script type="text/javascript">
+			require(["dojo/parser", "esri/map", "esri/layers/OpenStreetMapLayer", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/domReady!"],function(parser, Map, OpenStreetMapLayer){
+				parser.parse();
+				var map = new Map("mapDiv",{zoom: 4, center: [135, 38]});
+				var agoServiceURL = "http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer";
+				var agoLayer = new OpenStreetMapLayer(agoServiceURL,{
+					displayLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+					
+				});
+				
+				map.addLayer(agoLayer);
+			});
+		</script>
+		<script type="text/javascript">
+			require(["dojo/parser", "dijit/layout/ContentPane", "dijit/form/Button", "dojo/domReady!"], function(parser){
+				parser.parse();
+			});
+		</script>
+		
+	</head>
+	<body class="tundra">
+		
+			
+		<!--BorderContainer容器-->
+		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false" id="main">
+			
+				
+			<!--上子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'" style="margin-bottom:2px ; background-color: skyblue; background-image: url(../img/headerBackG.jpg); height: 9%;">
+				<div id="header">
+					<img src="../img/WuXZ.png"/>
+					<img id="Snoopy1" src="../img/snoopy01.png"/>
+				</div>
+			</div>
+			
+			<!--左子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="margin-right: 2px; background-color: #EEE; width: 12%;">
+				<div id="leftContent">
+					<img src="../img/个人logo.png"/>
+					<p>🤷Mr.Wu</p>
+					<br />
+					<div id="navigationBar">
+						<ul>
+							<li><a href="../index.html" class="btn-menu" >HOME</a></li>
+							<li style="background-color:  darkred;"><a href="../BlogCatalog.html"  class="btn-menu">BLOGS</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="mailto:ngheizitwu@163.com"  class="btn-menu">TOEMAIL</a></li>
+						</ul>
+					</div>
+					<div id="DENGTING">
+						<img id="DT" src="../img/snoopy02.jpg"/>
+					</div>
+				</div>
+			</div>
+			
+			<!--中子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="background-color: whitesmoke;padding: 10px;">
+				
+				<a href="#title" style="position: fixed;top: 500px;left: 870px;display: block;width: 40px;height: 40px;background-color: #343434;text-align: center;font-size: 22px;line-height: 1.5;">🎈</a>
+					
+					<a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: left;">
+							Back to BlogCatalog
+				</a><br /><br />
+					
+					
+				<!--博客展示框-->
+			<div id="content">
+			
+			
+				<p id="title">⚓分幅矢量数据的下载及基于arcpy的分幅数据批量处理</p>
+				<span id="time">2019年01月03日 21:52:27</span>
+				<span id="author">Ngheizit</span>
+				<hr />
+				<p class="strong1">1. 前言</p>
+				<p class="text">获取原始矢量数据是进行地理分析的重要前提，因此，原始数据的完整性和准确性是影像地理分析结果的决定性因素之一。</p>
+				<p class="text">笔者在进行了一周的实践周实训之后，掌握了一种较为可行的原始矢量数据下载和一些基于arcpy模块包的python脚本批量处理原始数据的编程技术。</p>
+				<p class="text">为此，笔者将所学到的技术都会在下文中进行分享~~</p>
+				<p class="strong1">2. 原始矢量数据的下载</p>	
+				<p class="text"><a href="https://www.webmap.cn/main.do?method=index">全国地理信息资源目录服务系统</a></p>
+				<p class="picture"><img src="DT001P/1.png"/></p>
+				<p class="text">该网站可以涉及许多地理数据，获得许可后均可进行下载，其中，最主要的模块有30m全球地表覆盖数据、1:100万全球基础地理数据库、1:25万全球基础地理数据库。笔者将以1:100万全球基础地理数据库作为例子进行实验。</p>
+				<p class="picture"><img src="DT001P/2.png"/></p>
+				<p class="text">该数据以分幅作为组织形式，因此可以根据实际的研究范围进行分幅区域的选择下载，下载的文件格式是文件型数据库</p>
+				<p class="picture"><img src="DT001P/3.png"/></p>
+				<p class="text">本文将以I50、I51、H50、H51分幅数据作为例子进行实验，并用arcpy对分幅数据进行批量的合并、融合、关联、裁切等的处理，最终获得其中长三角地区矢量数据。</p>
+				<p class="text">原始数据如下图</p>
+				<p class="picture"><img src="DT001P/4.png"/></p>
+				<p class="text">数据说明</p>
+				<p class="picture"><img src="DT001P/5.png"/></p>
+				<p class="strong">3. 基于arcpy的分幅数据批量处理过程</p>
+				<p class="strong2">3.1 arcpy模块包及相关变量的准备</p>
+				<pre><code>
+# -*- coding: utf-8 -*- 
+import arcpy  #导入arcpy包
+arcpy.gp.overwriteOutput=1   #允许重名文件覆盖
+
+#设置工作空间
+arcpy.env.workspace = "C:\\Users\\GISER\Desktop\\实践周_分幅拼接\\华东长三角"
+
+#矢量数据的要素类
+datas = ["AANP", "AGNP", "BOUA", "BOUL", "BOUP", "HYDA", "HYDL", "HYDP", "LRDL", "LRRL", "RESA", "RESP"]
+
+datasets = []   #数据集名称集合
+
+b = ["H", "I"]  #分幅编号字母位，当分幅较多时，可运用循环遍历部分ascii码定义
+
+filegdb = "result_yan.gdb"   #工作数据库名称					
+					</code></pre>
+					<p class="strong2">3.2  创建数据库及相关要素集</p>
+					<pre><code>
+#创建文件型数据库
+arcpy.CreateFileGDB_management(arcpy.env.workspace, filegdb) #创建文件型数据库
+
+#数据库要素集坐标系获取
+pjsion = arcpy.Describe("H50.gdb\\AANP")
+coord_sys = pjsion.spatialReference
+
+#创建数据库要素集
+for i in b:
+    a = 50 #分幅编号最小数值位
+    while a &lt;= 51:   #分幅编码最大数值位
+        output = i + str(a)
+        arcpy.CreateFeatureDataset_management(filegdb, output, coord_sys)
+        datasets.append(i + str(a))
+        a = a + 1						
+					</code></pre>
+					<p class="strong2">3.3  把分幅数据分幅导入相应分幅编号的数据库要素集中</p>
+					<pre><code>
+for i in datasets:
+    n = 0
+    datas_buffer = []
+    output = filegdb + "\\" + i
+    while n &lt; 12: 
+        datas_buffer.append(i + ".gdb\\" + datas[n])
+        n = n + 1       
+    arcpy.FeatureClassToGeodatabase_conversion(datas_buffer, output)					
+					</code></pre>
+					<p class="strong2">3.4 分幅数据合并</p>
+					<pre><code>
+merge_Dataset = "merge"
+arcpy.CreateFeatureDataset_management(filegdb, merge_Dataset, coord_sys)
+
+merge_datas = []
+for i in datas:
+    n = 0
+    datasets_buffer = []
+    output = filegdb + "\\" + merge_Dataset + "\\merge_" + i
+    while n &lt; 4:
+        suffix = ""
+        if n == 0:
+            suffix = ""
+        else:
+            suffix = "_" + str(n)
+        datasets_buffer.append(filegdb + "\\" + datasets[n] + "\\" + i + suffix)
+        n = n + 1
+    arcpy.Merge_management(datasets_buffer, output)
+    merge_datas.append(output)						
+					</code></pre>
+					<p class="strong2">3.5  对合并后的数据进行融合以及字段关联</p>
+					<pre><code>
+dissolve_datas = []
+n = 0
+for i in datas:
+    input_mg = merge_datas[n]
+    output = filegdb + "\\" + dissolve_Dataset + "\\" + "dissolve_" + i
+    if i == "BOUA":
+        arcpy.Dissolve_management(input_mg, output, "PAC", "","SINGLE_PART")
+        arcpy.JoinField_management(output, "PAC", input_mg, "PAC", "NAME")
+        dissolve_datas.append(output)
+    elif i == "BOUL":
+        arcpy.Dissolve_management(input_mg, output, "GB", "","SINGLE_PART")
+        dissolve_datas.append(output)
+    elif i == "HYDA":
+        arcpy.Dissolve_management(input_mg, output, "NAME;GB", "","SINGLE_PART")
+        arcpy.JoinField_management(output, "NAME", input_mg, "NAME", "HYDC;PERIOD;VOL")
+        dissolve_datas.append(output)
+    elif i == "HYDL":
+        arcpy.Dissolve_management(input_mg, output, "NAME;GB", "","SINGLE_PART")
+        arcpy.JoinField_management(output, "NAME", input_mg, "NAME", "HYDC;PERIOD")
+        dissolve_datas.append(output)
+    elif i == "LRDL":
+        arcpy.Dissolve_management(input_mg, output, "NAME;GB", "","SINGLE_PART")
+        arcpy.JoinField_management(output, "NAME", input_mg, "NAME", "RN;RTEG;TYPE")
+        arcpy.FeatureToLine_management(output,output + "_")
+        dissolve_datas.append(output + "_")
+    elif i == "LRRL":
+        arcpy.Dissolve_management(input_mg, output, "NAME;GB", "","SINGLE_PART")
+        arcpy.JoinField_management(output, "NAME", input_mg, "NAME", "RN;TYPE")
+        arcpy.FeatureToLine_management(output,output + "_")
+        dissolve_datas.append(output + "_")
+    elif i == "RESA":
+        arcpy.Dissolve_management(input_mg, output, "GB", "","SINGLE_PART")
+        dissolve_datas.append(output)
+    else:
+        arcpy.FeatureClassToGeodatabase_conversion(input_mg, filegdb + "//dissolve")
+        dissolve_datas.append(input_mg)
+    n = n + 1						
+					</code></pre>
+					<p class="strong2">3.6 GB或CLASS字段含义导入</p>
+					<pre><code>
+arcpy.TableToGeodatabase_conversion("C:\\Users\\GISER\\Desktop\\实践周_分幅拼接\\华东长三角\\CLASS_A.csv", filegdb) #CLASS
+arcpy.TableToGeodatabase_conversion("C:\\Users\\GISER\\Desktop\\实践周_分幅拼接\\华东长三角\\GB.csv", filegdb) #GB
+n = 0
+for i in datas:
+    print i
+    if i == "BOUA":
+        #对BOUA行政面数据添加分级字段属性
+        field_name = ["PROVINCE", "CITY"]
+        for j in field_name:
+            arcpy.AddField_management(dissolve_datas[n], j, "TEXT")
+            if j == "CITY":
+                arcpy.CalculateField_management(dissolve_datas[n], j, "Right(Left([PAC], 4), 2)", "VB")
+            else:
+                arcpy.CalculateField_management(dissolve_datas[n], j, "Left([PAC], 2)", "VB")
+    elif i == "AGNP" or i == "AANP":
+        arcpy.JoinField_management(dissolve_datas[n], "CLASS", filegdb + "\\CLASS_A", "CLASS", "MEAN")
+    else:
+        arcpy.JoinField_management(dissolve_datas[n], "GB", filegdb + "\\GB", "GB", "MEAN")
+    n = n + 1						
+					</code></pre>
+					<p class="strong2">3.7  批量裁切获取长三角区域范围数据</p>
+					<pre><code>
+geo_Range = filegdb + "//" + "geo_Range"
+arcpy.Select_analysis(dissolve_datas[2], geo_Range, "PROVINCE = '31' OR PROVINCE = '32' OR PROVINCE = '33' OR PROVINCE = '34'")
+
+clip_Dataset = "clip"
+arcpy.CreateFeatureDataset_management(filegdb, clip_Dataset, coord_sys)
+
+clip_datas = []
+n = 0
+for i in datas:
+    output = filegdb + "//" + clip_Dataset + "//clip_" + i
+    arcpy.Clip_analysis(dissolve_datas[n], geo_Range, output)
+    clip_datas.append(output)
+    n = n + 1						
+				</code></pre>				
+			
+			
+				
+				
+				
+		</div>
+				
+			<a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: right;">
+							Back to BlogCatalog
+			</a>	
+				
+				 
+				
+			</div>
+			
+			<!--右子节点   堆叠容器-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="background-color: beige;width: 30%;">
+				
+
+					
+					<div data-dojo-type="dijit/layout/ContentPane" title="My Share" style="background-color: #333">
+						
+						<div id="rightContent" data-dojo-type="dijit/layout/AccordionContainer" style="padding: 0;overflow: hidden;z-index: 29;">
+							
+												
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Personally Used Websites~~">
+								<ul>
+									<li><a href="https://g3.luciaz.me/">Google Search</a></li>
+									<li><a href="https://translate.google.cn/">Google Translate</a></li>
+									<li><a href="https://github.com/">GitHub</a></li>
+									<li><a href="https://en.wikipedia.org/wiki/Wikipedia">Wikipedia</a></li>
+									<li><a href="http://mail.163.com/js6/main.jsp?sid=wCosRfXjyqeoXrgzdYjjcnHbCbAzztVX&df=unknow#module=welcome.WelcomeModule%7C%7B%7D">163email</a></li>
+									<li><a href="http://www.cnki.net/">中国知网</a></li>
+									<li><a href="http://www.hebtu.edu.cn/">河北师大</a></li>
+									<li><a href="https://www.12306.cn/index/">12306</a></li>
+									<li><a href="http://ac.scmor.com/">谷歌镜像1</a></li>
+									<li><a href="https://vvp0.499994.xyz/googlebak.html">谷歌镜像2</a></li>
+								</ul>				
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Programming Tutorial Websites~~">
+								<ul>									
+									<li><a href="https://unbug.github.io/codelf/#%E5%AF%B9%E8%A7%92%E7%9F%A9%E9%98%B5">标识符命名智能查询</a></li>
+									<li><a href="https://study.163.com/course/courseMain.htm?courseId=1004987028&_trace_c_p_k2_=0469f8e885924c06a3c0e584af85cad9#/courseDetail?tab=1">Python全栈_网易云课堂</a></li>
+									<li><a href="http://www.runoob.com/java/java-tutorial.html">Java 教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/python/python-tutorial.html">Python 基础教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/">菜鸟教程</a></li>
+									<li><a href="https://www.python-course.eu/index.php">Python外文教程</a></li>
+									<li><a href="https://www.python.org/">Python官网</a></li>
+									<li><a href="https://www.geeksforgeeks.org/">极客的计算机科学门户网站</a></li>	
+									<li><a href="https://www.jianshu.com/p/df7a3f0b4c00">2018尚硅谷资源 - 简书</a></li>
+									<li><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">python第三方库</a></li>
+									<li><a href="http://www.w3school.com.cn/index.html">w3school 在线教程</a></li>
+									<li><a href="http://gaohr.win/">GaoHR</a></li>
+									<li><a href="https://www.csdn.net/">CSDN</a></li>
+									<li><a href="https://www.oracle.com/index.html">Orccle官网</a></li>
+									<li><a href="https://netbeans.org/downloads/8.2/">Netbeans下载网址</a></li>
+									<li><a href="https://developer.mozilla.org/zh-CN/">MDN web学习</a></li>
+									<li><a href="https://dojotoolkit.org/documentation/">Dojo教程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Criminal Geography~~">
+								<ul>
+									<li><a href="https://www.ucrdatatool.gov/Search/Crime/State/RunCrimeOneYearofData.cfm">FBI统一犯罪报告统计</a></li>
+									<li><a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/borough-and-precinct-crime-stats.page#brooklyn">纽约警察局犯罪统计</a></li>
+									<li><a href="https://www.fgdc.gov/HSWG/index.html">紧急符号系统参考</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat.aspx">CrimeStat说明</a></li>
+									<li><a href="https://www.icpsr.umich.edu/CrimeStat/workbook.html">CrimeStat3用户手册</a></li>
+									<li><a href="https://studysites.uk.sagepub.com/bobasantos3e/study/default.htm">SAGE-犯罪分析学生研究网站，第三版</a></li>
+									<li><a href="http://discovery.ucl.ac.uk/11291/1/11291.pdf">外文：犯罪制图-认识犯罪热点</a></li>
+									<li><a href="http://faculty.uml.edu/jbyrne/44.203/Use%20of%20Computerized%20Crime%20Mapping%20by%20Law%20Enforcement.pdf">外文：电子犯罪测绘的应用执法-调查结果</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat-downloads.aspx">CrimeStat材料下载</a></li>
+									<li><a href="https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.0016-7363.2005.00673.x">外文：犯罪制图与统计工程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Geographic data sharing websites~~">
+								<ul>
+									<li><a href="https://www.openstreetmap.org/">openstreetmaps</a></li>
+									<li><a href="http://webmap.cn/main.do?method=index">全国地理信息资源目录服务系统</a></li>
+									<li><a href="https://gisgeography.com/free-global-dem-data-sources/">全球DEM数据获取网站导航</a></li>
+									<li><a href="https://freegisdata.rtwilson.com/">免费GIS数据获取网站导航</a></li>
+									<li><a href="https://ghsl.jrc.ec.europa.eu/">全球人类住区-欧委会</a></li>
+									<li><a href="http://pan.xiaze.org/nj/2015qgrkcydczl/indexch.htm">2015年全国1%人口抽样调查资料</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/ndsj/renkou/2005/renkou.htm">2005年全国1%人口抽样调查数据</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/pcsj/rkpc/6rp/indexch.htm">2010年全国第六次人口普查</a></li>
+									<li><a href="http://www.gscloud.cn/">地理数据云</a></li>
+									<li><a href="https://modis.gsfc.nasa.gov/data/dataprod/mod01.php">MODIS数据获取网站</a></li>
+									<li><a href="http://www.glcf.umd.edu/data/">landset影像下载</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~GIS Learning Websites~~" >
+								<ul>
+									<li><a href="http://contest.esrichina.com.cn/">ESRI大赛</a></li>
+									<li><a href="https://pro.arcgis.com/zh-cn/pro-app/help/analysis/geoprocessing/modelbuilder/modelbuilder-tutorial.htm">模型构建器教程—ArcGIS</a></li>
+									<li><a href="http://ivt.maps.arcgis.com/apps/MapSeries/index.html?appid=9766dba97c954fcaa175da83b72ccf06&adumkts=social&utm_source=social&aduc=social&adum=external&aduSF=facebook&aduca=social_technical&aduco=unlocking_information_imagery_3&aduat=storymap&adbsc=social_20190105_2655151&adbid=6486562228236615680&adbpl=li&adbpr=5311&adbid=10156755029730281&adbpl=fb&adbpr=211211155280">影像在ARCGIS中的应用</a></li>
+									<li><a href="https://www.gislounge.com/">GIS茶间室-地图和GIS</a></li>
+									<li><a href="http://pro.arcgis.com/zh-cn/pro-app/tool-reference/main/arcgis-pro-tool-reference.htm">Arctoolbox</a></li>
+									<li><a href="http://html.rhhz.net/CHXB/html/2017-11-1919.htm">加权泰森多边形文章</a></li>
+									<li><a href="http://zhihu.esrichina.com.cn/">Arcgis知乎</a></li>
+									<li><a href="https://www.nasa.gov/">NASA网</a></li>
+									<li><a href="https://developers.arcgis.com/javascript/">ArcGIS API for JavaScript</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Else  Websites~~" >
+								<ul>
+									<li><a href="https://www.chrome-games.com/">GAME</a></li>
+									<li><a href="http://karuga.eu/2048-3D/">3D2048</a></li>
+									<li><a href="https://www.fbi.gov/">FBI官网</a></li>
+									<li><a href="https://www.gocomics.com/peanuts">花生漫画</a></li>
+									<li><a href="https://link.springer.com/">施普林格</a></li>
+								</ul>
+							</div>
+							
+						</div>
+					</div>
+
+			
+			</div>
+			
+			<!--下子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" style="margin-top: 2px; background-color: honeydew;height: 4%;">
+				<div id="footer">
+					<span>(c) Copyright 2019 Wu Xizhe. All Rights Reserved.</span>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>
+

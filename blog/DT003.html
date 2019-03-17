@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>基于空间二维坐标的多边形面积计算</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/BlogsListModel.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/BlogShow.css"/>
+		<link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dojox/layout/resources/FloatingPane.css" />
+		<link rel="stylesheet" type="text/css" href="../css/BlogCSS.css"/>
+		<link rel="stylesheet" type="text/css" href="css/BlogsListModel.css"/>
+				<!--    基于于ArcGIS API for JavaScript的FloatingPane面板的样式    -->
+    	<link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dojox/layout/resources/FloatingPane.css" />
+    	
+		<!--   makeAboutBox函数   -->
+		<script src="../js/BlogShow.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="../css/BlogShow.css"/>
+		
+		<!--导入页面CSS模板-->
+		<link rel="stylesheet" type="text/css" href="../css/PageTemplate.css"/>
+		
+		<!--
+			BorderContainer容器
+				- 每BorderContainer实例可以至多允许包含5个不同区域
+					-- 上、下、左、右、中
+					-- 若某个区域需进一步分解，则将BorderContainer中的一个区域设置为另一个BorderContainer实例
+				- 通过“design”属性控制其子元素的位置
+					--属性值：
+						--- headline
+							---- 上下两个区域优先设置，且宽度与整个BorderContainer的宽度相同
+							---- 上中下结构
+						--- sidebar
+							---- 左右两个区域优先设置，且高度与整个BorderContainer的高度相同
+							---- 左中右结构
+				- 需要设定宽width 高height (利用CSS样式即可)
+				- 左右子节点可设置宽度
+				- 上下子节点可设置高度
+				- 属性slitter 设置是否可拖拽子节点以修改尺寸
+		-->
+		
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/tundra/tundra.css"/>
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/esri/css/esri.css"/>
+		
+		<style type="text/css">
+			html,body,#main{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			dojoConfig = {
+				isDebug: true,
+				async: true
+			};
+		</script>
+		
+		<script src="http://js.arcgis.com/3.9/" type="text/javascript"></script>
+		
+		<script type="text/javascript">
+			require(["dojo/parser", "esri/map", "esri/layers/OpenStreetMapLayer", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/domReady!"],function(parser, Map, OpenStreetMapLayer){
+				parser.parse();
+				var map = new Map("mapDiv",{zoom: 4, center: [135, 38]});
+				var agoServiceURL = "http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer";
+				var agoLayer = new OpenStreetMapLayer(agoServiceURL,{
+					displayLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+					
+				});
+				
+				map.addLayer(agoLayer);
+			});
+		</script>
+		<script type="text/javascript">
+			require(["dojo/parser", "dijit/layout/ContentPane", "dijit/form/Button", "dojo/domReady!"], function(parser){
+				parser.parse();
+			});
+		</script>
+		
+	</head>
+	<body class="tundra">
+		
+			
+		<!--BorderContainer容器-->
+		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false" id="main">
+			
+				
+			<!--上子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'" style="margin-bottom:2px ; background-color: skyblue; background-image: url(../img/headerBackG.jpg); height: 9%;">
+				<div id="header">
+					<img src="../img/WuXZ.png"/>
+					<img id="Snoopy1" src="../img/snoopy01.png"/>
+				</div>
+			</div>
+			
+			<!--左子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="margin-right: 2px; background-color: #EEE; width: 12%;">
+				<div id="leftContent">
+					<img src="../img/个人logo.png"/>
+					<p>🤷Mr.Wu</p>
+					<br />
+					<div id="navigationBar">
+						<ul>
+							<li><a href="../index.html" class="btn-menu" >HOME</a></li>
+							<li style="background-color:  darkred;"><a href="../BlogCatalog.html"  class="btn-menu">BLOGS</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="mailto:ngheizitwu@163.com"  class="btn-menu">TOEMAIL</a></li>
+						</ul>
+					</div>
+					<div id="DENGTING">
+						<img id="DT" src="../img/snoopy02.jpg"/>
+					</div>
+				</div>
+			</div>
+			
+			<!--中子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="background-color: whitesmoke;padding: 10px;">
+				<a href="#title" style="position: fixed;top: 500px;left: 870px;display: block;width: 40px;height: 40px;background-color: #343434;text-align: center;font-size: 22px;line-height: 1.5;">🎈</a>
+				
+				 <a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: left;">
+							Back to BlogCatalog
+				</a><br /><br />
+				
+				
+				<div id="content">
+			
+								
+					<p id="title">⚓基于空间二维坐标的多边形面积计算</p>
+					<span id="time">2019年03月03日 10:50:27</span>
+					<span id="author">Ngheizit</span>
+					<hr  />
+					<p class="strong1">1. 概念</p>
+					<p class="text">在矢量结构下，面状地物以轮廓边界弧段构成的多边形面积表示。</p>
+					<p class="text">梯形法是多边形面积量算的主要方法之一。</p>
+					<span class="strong2">其基本思想是：</span>
+					<p class="text">在平面直角坐标系中，按多边形顶点顺序依次求出多边形所有边与x轴（或y轴）组成的梯形面积，然后求其代数和，多边形边界与坐标轴组成的多边形外部梯形部分的面积将由计算的正负差值抵消，最后剩下多边形内部梯形部分面积。</p>
+					<p class="picture"><img src="DT003P/图示.jpg" height="300px"/></p>
+					<p class="text">对于没有空洞的简单多边形，假设有N个顶点，其中S为多边形面积，(x,y)为多边形顶点坐标。其面积计算公式为：</p>
+					<p class="picture"><img src="DT003P/公式.PNG"/  style="height: calc(50px);" ></p>
+					<p class="strong1">2. 公式应用</p>
+					<p class="text">点击下方按钮显示的内容为本人运用JavaScript脚本编写的应用，以展示通过上图公式在实际中的应用，相关详细代码可通过浏览器控制台查看或在后文中简单讲述。</p>
+						
+					
+		
+					
+					<!--   ContextPane面板   -->
+					<div data-dojo-type="dijit/layout/ContentPane" id="ContentPane1">
+						<!--  按钮小部件   -->
+						<div data-dojo-type="dijit/form/Button">
+							面积量算
+							
+							<!--  动态创建FloatingPane小部件代码     -->
+							<script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+								makeAboutBox("DT003P/svg.html","多边形面积量算模拟器");
+							</script>
+						</div>
+					</div>
+					<a href="DT003P/svg.html">应用具体网址（若模拟器无法正常使用）</a>
+					
+					<p class="strong1">3. 代码思想</p>
+					<p class="text"><img src="DT003P/代码.PNG"  style="height: calc(200px);" /></p>
+					<p class="text">在上图代码中，图形的点集通过数组对象进行存储，具体形式为[x<sub>1</sub> , y<sub>1</sub> , x<sub>2</sub> , y<sub>2</sub> ,..., x<sub>n</sub> , y<sub>n</sub>]。</p>
+					<p class="text">可待改进...</p>
+						
+					
+					
+				</div>
+					
+				
+				 <a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: right;">
+							Back to BlogCatalog
+				</a>
+				
+			</div>
+			
+			<!--右子节点   堆叠容器-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="background-color: beige;width: 30%;">
+				
+
+					
+					<div data-dojo-type="dijit/layout/ContentPane" title="My Share" style="background-color: #333">
+						
+						<div id="rightContent" data-dojo-type="dijit/layout/AccordionContainer" style="padding: 0;overflow: hidden;z-index: 29;">
+							
+												
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Personally Used Websites~~">
+								<ul>
+									<li><a href="https://g3.luciaz.me/">Google Search</a></li>
+									<li><a href="https://translate.google.cn/">Google Translate</a></li>
+									<li><a href="https://github.com/">GitHub</a></li>
+									<li><a href="https://en.wikipedia.org/wiki/Wikipedia">Wikipedia</a></li>
+									<li><a href="http://mail.163.com/js6/main.jsp?sid=wCosRfXjyqeoXrgzdYjjcnHbCbAzztVX&df=unknow#module=welcome.WelcomeModule%7C%7B%7D">163email</a></li>
+									<li><a href="http://www.cnki.net/">中国知网</a></li>
+									<li><a href="http://www.hebtu.edu.cn/">河北师大</a></li>
+									<li><a href="https://www.12306.cn/index/">12306</a></li>
+									<li><a href="http://ac.scmor.com/">谷歌镜像1</a></li>
+									<li><a href="https://vvp0.499994.xyz/googlebak.html">谷歌镜像2</a></li>
+								</ul>				
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Programming Tutorial Websites~~">
+								<ul>									
+									<li><a href="https://unbug.github.io/codelf/#%E5%AF%B9%E8%A7%92%E7%9F%A9%E9%98%B5">标识符命名智能查询</a></li>
+									<li><a href="https://study.163.com/course/courseMain.htm?courseId=1004987028&_trace_c_p_k2_=0469f8e885924c06a3c0e584af85cad9#/courseDetail?tab=1">Python全栈_网易云课堂</a></li>
+									<li><a href="http://www.runoob.com/java/java-tutorial.html">Java 教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/python/python-tutorial.html">Python 基础教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/">菜鸟教程</a></li>
+									<li><a href="https://www.python-course.eu/index.php">Python外文教程</a></li>
+									<li><a href="https://www.python.org/">Python官网</a></li>
+									<li><a href="https://www.geeksforgeeks.org/">极客的计算机科学门户网站</a></li>	
+									<li><a href="https://www.jianshu.com/p/df7a3f0b4c00">2018尚硅谷资源 - 简书</a></li>
+									<li><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">python第三方库</a></li>
+									<li><a href="http://www.w3school.com.cn/index.html">w3school 在线教程</a></li>
+									<li><a href="http://gaohr.win/">GaoHR</a></li>
+									<li><a href="https://www.csdn.net/">CSDN</a></li>
+									<li><a href="https://www.oracle.com/index.html">Orccle官网</a></li>
+									<li><a href="https://netbeans.org/downloads/8.2/">Netbeans下载网址</a></li>
+									<li><a href="https://developer.mozilla.org/zh-CN/">MDN web学习</a></li>
+									<li><a href="https://dojotoolkit.org/documentation/">Dojo教程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Criminal Geography~~">
+								<ul>
+									<li><a href="https://www.ucrdatatool.gov/Search/Crime/State/RunCrimeOneYearofData.cfm">FBI统一犯罪报告统计</a></li>
+									<li><a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/borough-and-precinct-crime-stats.page#brooklyn">纽约警察局犯罪统计</a></li>
+									<li><a href="https://www.fgdc.gov/HSWG/index.html">紧急符号系统参考</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat.aspx">CrimeStat说明</a></li>
+									<li><a href="https://www.icpsr.umich.edu/CrimeStat/workbook.html">CrimeStat3用户手册</a></li>
+									<li><a href="https://studysites.uk.sagepub.com/bobasantos3e/study/default.htm">SAGE-犯罪分析学生研究网站，第三版</a></li>
+									<li><a href="http://discovery.ucl.ac.uk/11291/1/11291.pdf">外文：犯罪制图-认识犯罪热点</a></li>
+									<li><a href="http://faculty.uml.edu/jbyrne/44.203/Use%20of%20Computerized%20Crime%20Mapping%20by%20Law%20Enforcement.pdf">外文：电子犯罪测绘的应用执法-调查结果</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat-downloads.aspx">CrimeStat材料下载</a></li>
+									<li><a href="https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.0016-7363.2005.00673.x">外文：犯罪制图与统计工程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Geographic data sharing websites~~">
+								<ul>
+									<li><a href="https://www.openstreetmap.org/">openstreetmaps</a></li>
+									<li><a href="http://webmap.cn/main.do?method=index">全国地理信息资源目录服务系统</a></li>
+									<li><a href="https://gisgeography.com/free-global-dem-data-sources/">全球DEM数据获取网站导航</a></li>
+									<li><a href="https://freegisdata.rtwilson.com/">免费GIS数据获取网站导航</a></li>
+									<li><a href="https://ghsl.jrc.ec.europa.eu/">全球人类住区-欧委会</a></li>
+									<li><a href="http://pan.xiaze.org/nj/2015qgrkcydczl/indexch.htm">2015年全国1%人口抽样调查资料</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/ndsj/renkou/2005/renkou.htm">2005年全国1%人口抽样调查数据</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/pcsj/rkpc/6rp/indexch.htm">2010年全国第六次人口普查</a></li>
+									<li><a href="http://www.gscloud.cn/">地理数据云</a></li>
+									<li><a href="https://modis.gsfc.nasa.gov/data/dataprod/mod01.php">MODIS数据获取网站</a></li>
+									<li><a href="http://www.glcf.umd.edu/data/">landset影像下载</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~GIS Learning Websites~~" >
+								<ul>
+									<li><a href="http://contest.esrichina.com.cn/">ESRI大赛</a></li>
+									<li><a href="https://pro.arcgis.com/zh-cn/pro-app/help/analysis/geoprocessing/modelbuilder/modelbuilder-tutorial.htm">模型构建器教程—ArcGIS</a></li>
+									<li><a href="http://ivt.maps.arcgis.com/apps/MapSeries/index.html?appid=9766dba97c954fcaa175da83b72ccf06&adumkts=social&utm_source=social&aduc=social&adum=external&aduSF=facebook&aduca=social_technical&aduco=unlocking_information_imagery_3&aduat=storymap&adbsc=social_20190105_2655151&adbid=6486562228236615680&adbpl=li&adbpr=5311&adbid=10156755029730281&adbpl=fb&adbpr=211211155280">影像在ARCGIS中的应用</a></li>
+									<li><a href="https://www.gislounge.com/">GIS茶间室-地图和GIS</a></li>
+									<li><a href="http://pro.arcgis.com/zh-cn/pro-app/tool-reference/main/arcgis-pro-tool-reference.htm">Arctoolbox</a></li>
+									<li><a href="http://html.rhhz.net/CHXB/html/2017-11-1919.htm">加权泰森多边形文章</a></li>
+									<li><a href="http://zhihu.esrichina.com.cn/">Arcgis知乎</a></li>
+									<li><a href="https://www.nasa.gov/">NASA网</a></li>
+									<li><a href="https://developers.arcgis.com/javascript/">ArcGIS API for JavaScript</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Else  Websites~~" >
+								<ul>
+									<li><a href="https://www.chrome-games.com/">GAME</a></li>
+									<li><a href="http://karuga.eu/2048-3D/">3D2048</a></li>
+									<li><a href="https://www.fbi.gov/">FBI官网</a></li>
+									<li><a href="https://www.gocomics.com/peanuts">花生漫画</a></li>
+									<li><a href="https://link.springer.com/">施普林格</a></li>
+								</ul>
+							</div>
+							
+						</div>
+					</div>
+
+			
+			</div>
+			
+			<!--下子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" style="margin-top: 2px; background-color: honeydew;height: 4%;">
+				<div id="footer">
+					<span>(c) Copyright 2019 Wu Xizhe. All Rights Reserved.</span>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>
+
