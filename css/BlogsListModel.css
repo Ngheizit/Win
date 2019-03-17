@@ -1,0 +1,33 @@
+.blogsList{
+	display: block;
+	color: purple;
+	margin: 10px;
+	padding: 10px;
+	background-color: aliceblue;
+	border-radius: calc(24px);
+	border: midnightblue 5px solid;
+	transition: 0.5s;  /*  设置过渡效果时间   */
+}
+.blogsList:hover{
+	color: white;
+	border-color: greenyellow;
+	box-shadow: 10px 10px 10px #000000;   /* 设置阴影*/
+	background-color: transparent;
+	border-width: 5px;
+}
+.blogsList .blogtitle{
+	font-weight: bold;
+	font-size: 24px;
+}
+.blogsList .blogtime{
+	font-size: 12px;
+	text-align: center;
+}
+.blogsList .blogbrief{
+	text-indent: 2em;
+	font-size: 18px;
+}
+.blogsList .blogkeyword{
+	text-align: right;
+	font-style: italic;
+}

@@ -1,0 +1,48 @@
+#content{
+	margin: 30px;
+	padding: 10px;
+}
+#content *{
+	margin: 10px;
+}
+#content #title{
+	font-size: 32px;
+	font-weight: bold;
+}
+#content #time{
+	font-size: 14px;
+	padding-left: 20px;
+}
+#content #author{
+	font-size: 14px;
+	padding-left: 20px;
+	font-style: italic;
+}
+#content .strong1{
+	font-size: 26px;
+	font-weight: bold;
+}
+#content .strong2{
+	font-size: 22px;
+	font-weight: bold;
+}
+#content .text{
+	text-indent: 2em;
+}
+#content .picture{
+	width: 90%;
+	overflow: auto;
+}
+#content p img{
+	height: calc(300px);
+}
+#content pre{
+	background-color: #343434;  /*   背景颜色   */
+	color: antiquewhite;  /*    字体颜色    */
+	width: 80%;  /*    宽      */
+	margin: 0 auto;  /*      居中布局       */
+	overflow: auto;  /*    多余自动滚轮显示     */
+	padding: 3px;  /*    内边距     */
+	border: 1px solid black; /*   边框     */
+	box-shadow:  10px 10px 5px #888888;  /*    阴影     */
+}

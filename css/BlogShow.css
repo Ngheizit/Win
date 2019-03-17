@@ -1,0 +1,20 @@
+ .box {
+    margin-top: 0px;
+    color: #292929;
+    border: 1px solid #9F9F9F;
+    background-color: #EFEFEF;
+    padding-left: 10px;
+    padding-right: 20px;
+    margin-left: 10px;
+    margin-bottom: 1em;
+    border-radius: 10px;
+
+    -o-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    box-shadow: 8px 8px 16px #adadad;
+    -webkit-box-shadow: 8px 8px 16px #adadad;
+    -moz-box-shadow: 8px 8px 16px #adadad;
+    -o-box-shadow: 8px 8px 16px #adadad;
+    overflow: hidden;
+}
