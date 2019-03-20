@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>小希浙的LinearAlgebra</title>
+		<link rel="stylesheet" type="text/css" href="css/Surveying.css">
+
+
+
+		<link rel="stylesheet" type="text/css" href="css/BlogsListModel.css"/>
+		<link rel="stylesheet" type="text/css" href="css/BlogShow.css"/>
+		<link rel="stylesheet" href="https://js.arcgis.com/3.9/js/dojo/dojox/layout/resources/FloatingPane.css" />
+		<link rel="stylesheet" type="text/css" href="css/BlogCSS.css">
+		
+		
+		<!--导入页面CSS模板-->
+		<link rel="stylesheet" type="text/css" href="css/PageTemplate.css"/>
+		
+		<!--
+			BorderContainer容器
+				- 每BorderContainer实例可以至多允许包含5个不同区域
+					-- 上、下、左、右、中
+					-- 若某个区域需进一步分解，则将BorderContainer中的一个区域设置为另一个BorderContainer实例
+				- 通过“design”属性控制其子元素的位置
+					--属性值：
+						--- headline
+							---- 上下两个区域优先设置，且宽度与整个BorderContainer的宽度相同
+							---- 上中下结构
+						--- sidebar
+							---- 左右两个区域优先设置，且高度与整个BorderContainer的高度相同
+							---- 左中右结构
+				- 需要设定宽width 高height (利用CSS样式即可)
+				- 左右子节点可设置宽度
+				- 上下子节点可设置高度
+				- 属性slitter 设置是否可拖拽子节点以修改尺寸
+		-->
+		
+		<link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.9/js/dojo/dijit/themes/tundra/tundra.css"/>
+		<link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.9/js/esri/css/esri.css"/>
+		
+		<style type="text/css">
+			html,body,#main{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			dojoConfig = {
+				isDebug: true,
+				async: true
+			};
+		</script>
+		
+		<script src="https://js.arcgis.com/3.9/" type="text/javascript"></script>
+	
+		<script type="text/javascript">
+			require(["dojo/parser", "dijit/layout/ContentPane", "dijit/form/Button", "dojo/domReady!"], function(parser){
+				parser.parse();
+			});
+		</script>
+		
+	</head>
+	<body class="tundra">
+		
+			
+		<!--BorderContainer容器-->
+		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false" id="main">
+			
+				
+			<!--上子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'" style="margin-bottom:2px ; background-color: skyblue; background-image: url(img/headerBackG.jpg); height: 9%;">
+				<div id="header">
+					<img src="img/WuXZ.png"/>
+					<img id="Snoopy1" src="img/snoopy01.png"/>
+				</div>
+			</div>
+			
+			<!--左子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="margin-right: 2px; background-color: #EEE; width: 12%;">
+				<div id="leftContent">
+					<img src="img/个人logo.png"/>
+					<p>🤷Mr.Wu</p>
+					<br />
+					<div id="navigationBar">
+						<ul>
+							<li><a href="index.html" class="btn-menu" >HOME</a></li>
+							<li><a href="BlogCatalog.html"  class="btn-menu">BLOGS</a></li>
+							<li><a href="Surveying.html"  class="btn-menu">Surveying</a></li>
+							<li style="background-color:  darkred;"><a href="#"  class="btn-menu">Linear algebra</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="mailto:ngheizitwu@163.com"  class="btn-menu">TOEMAIL</a></li>
+						</ul>
+					</div>
+					<div id="DENGTING">
+						<img id="DT" src="img/snoopy02.jpg"/>
+					</div>
+				</div>
+			</div>
+			
+			<!--中子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="background-color: #ddd;padding: 10px;">
+				
+
+				<div id="content">
+					
+					<div id="title">基于Java编程语言的线性代数程式实现</div>
+
+					<p class="strong1">1. 前言：</p>
+					<p class="text">线性代数分两大模块，其一是行列式，其二是矩阵。由于Java编程语言是纯面向对象的语言，根据面向对象的特点，可以首先把行列式和矩阵看作是类（class）。当然，考虑到继承是面向对象编程的一大特点，所以我们可以把矩阵作为行列式的继承类，即矩阵类继承于行列式。</p>
+					<p class="text">然后，根据类具有两个成员（属性+方法）的特点，我们可以为行列式赋予存储行列式元素的容器属性，类型而二维数组，其他属性还包括行列式阶数和行列式系数，数据类型分别为整型和浮点型。</p>
+					<p class="text">行列式类的方法则根据行列式的性质等进行设置。矩阵类的构建则根据一定规则继承于行列式类。那么接下来，我们首先从行列式类的构建说起。（编程环境为NetBeans）</p>
+
+					<p class="strong1">2. 行列式的构建</p>
+					<p class="strong2">2.1 行列式类的属性成员及访问修饰</p>
+					<img src="LinearAlgebra/001_行列式类的属性成员及访问修饰.PNG" style="float: left;" />
+					<p class="text">如右图所示，该图为行列式类的属性成员及访问修饰符。要使行列式类能够被外部Java类所引用（这我们也是想达到的），就需要为该类的访问修饰设置为public，即公开的访问权限。</p>
+					<p class="text">在图中，我们还看到了该行列式类的三个属性成员，分别是用以存储行列式元素的容器（dtm）、行列式的阶数（rank）（即行列式，由于行列式的行和列相等，所以以阶数表示行数和列数）以及行列式的系数（coefficient）。</p>
+					<p class="text">就成员属性的数据类型而言，行列式顾名思义由一点相等行列元素组成，因此可以利用Java中的二维数组类型作为存储行列式元素的容器。阶数以整型数组存储以及系数用双精度浮点型类型存储，这两者就比较容易理解了。</p>
+					<p class="text">关于行列式的访问权限。根据面向对象编程的特点，一个完整的类，其属性成员不应该在类外部轻而易举地被修改，即只可读不可直接写。因此这些属性成员的访问修饰均设置为了private，即私有的，仅能在类内部访问。</p>
+					<p class="text">再说下属性成员的初始化问题。为了达到“能少占点内存就少占点内存”的理念，类的属性成员在不必要的时候可以不指定初始值，例如上图中的行列式元素存储容器（dtm），该属性都会在日后的每一个构造器中进行赋值，因此在这里进行指定初值作用并不大（且浪费）。行列式阶数（rank）跟dtm同理。而由于绝大多数情况下行列式的系数（coefficient）均为1，在类的构造过程中基本不同到，因此在这里九可以为该数据赋予初值1。</p>
+					<p class="text" style="text-align: right;"><i>到这里，行列式类的属性成员及访问修饰的内容就讲完啦。<br />编辑于：2019年3月20日20点53分 吴希浙<br />Location: 37.997549N 114.515106E<br />无更新</i></p>
+					
+					<p class="strong2">2.2 行列式类的构造器</p>
+					<p class="text">首先解释下构造器。构造器是能够创建对象的特殊方法，其名称需与类名完全一致，同时构造器不需要返回修饰，即无返回值，但需要public共有的访问权限，因为构造器需要在类的外部调用，这样才能构建对象，不然构造器就没有了它存在的意义了。总的来说构造器就相当于一种类似于静态方法的方法。</p>
+					<img src="LinearAlgebra/002_行列式类的构造器.PNG" style="float: right;width: 500px" />
+					<p class="text">如右图，我为行列式类写了三个构造器，这三个构造器的不同之处在于参数设置的不同，这叫做方法的重载，通过不同的参数列表来调用不同效果的构造器。接下来我们来一一解读下这三个构造器的用意吧。</p>
+					<p class="text">首先是第一个构造器，无参构造器。无参构造器顾名思义就是用来创建一个类似于空的行列式对象（构造器是一个类实例的过程，因此构造器创建出来的是对象而非类），因此我们称该行列对象式为默认行列式。默认行列式的阶数为1，即元素存储器一个存储单位，存储的元素值为0，阶数已在类体里（使用构造器前）默认为1。</p>
+					<p class="text">另一个构造器，有参构造器。参数个数为1，该参数类型为二维数组类型。该构造器的用意是利用参数给出的二维数组直接作为行列式的元素存储容器。但问题来了，行列式的行列数的相等的，而二维数组的行列数是自由的（可等可不等），由此可能会产生的后果就是在构造器执行过程中由于形参二维数组和行列式元素存储器（dtm）不匹配导致索引溢出。那么解决该问题的办法是什么呢？如上图该构造器的代码，在设置行列式对象阶数时，运用了三元运算符（?:），当形参二维数组的行数大于列数时，行列式阶数等于行数，反过来，形参二维数组列号大于行号时，行列式行数等于列数。那么，在赋值给行列式元素存储器（dtm）时就不会出现索引溢出的情况，而多出来的存储为，以0值代替。但总的来说这并不是一种最好的解决办法，因为这样会造成行列式中的某一行或列值均为0，那么该行列式就没有运算的意义了，因为值为0。</p>
+					<p class="text">第三个构造器。该构造器的参数为一维数组类型，用以是创建一个对角行列式对象。对角元素即为形参一维数组的元素，其余元素设为0（符合对角行列式特点）。</p>
+					<img src="LinearAlgebra/003_数组类型不能强制转换.PNG" style="float: right;" />
+					<p class="text">这里有一个问题。如上图,就是当传进来的参数数组类型为整型的时候，系统并不会把该整型数组强制转换为双精度浮点型数组，因此，如何使更多的数组类型作为参数传入构造器而又进可能的少写重载构造器是一个值得思考的问题。</p>
+					<p class="text" style="text-align: right;"><i>到这里，行列式类的构造器的内容就讲完啦。<br />编辑于：2019年3月20日21点50分 吴希浙<br />Location: 37.997549N 114.515106E<br />无更新</i></p>
+
+				
+
+			
+
+
+
+
+
+
+
+				 	<p class="strong1" style="text-align: center;">未完待续</p>
+				</div>
+			</div>
+			
+			<!--右子节点   堆叠容器-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="background-color: beige;width: 25%;">
+				
+
+					
+					<div data-dojo-type="dijit/layout/ContentPane" title="My Share" style="background-color: #333">
+						
+						<div id="rightContent" data-dojo-type="dijit/layout/AccordionContainer" style="padding: 0;overflow: hidden;z-index: 29;">
+							
+												
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Personally Used Websites~~">
+								<ul>
+									<li><a href="https://g3.luciaz.me/">Google Search</a></li>
+									<li><a href="https://translate.google.cn/">Google Translate</a></li>
+									<li><a href="https://github.com/">GitHub</a></li>
+									<li><a href="https://en.wikipedia.org/wiki/Wikipedia">Wikipedia</a></li>
+									<li><a href="http://mail.163.com/js6/main.jsp?sid=wCosRfXjyqeoXrgzdYjjcnHbCbAzztVX&df=unknow#module=welcome.WelcomeModule%7C%7B%7D">163email</a></li>
+									<li><a href="http://www.cnki.net/">中国知网</a></li>
+									<li><a href="http://www.hebtu.edu.cn/">河北师大</a></li>
+									<li><a href="https://www.12306.cn/index/">12306</a></li>
+									<li><a href="http://ac.scmor.com/">谷歌镜像1</a></li>
+									<li><a href="https://vvp0.499994.xyz/googlebak.html">谷歌镜像2</a></li>
+								</ul>				
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Programming Tutorial Websites~~">
+								<ul>									
+									<li><a href="https://unbug.github.io/codelf/#%E5%AF%B9%E8%A7%92%E7%9F%A9%E9%98%B5">标识符命名智能查询</a></li>
+									<li><a href="https://study.163.com/course/courseMain.htm?courseId=1004987028&_trace_c_p_k2_=0469f8e885924c06a3c0e584af85cad9#/courseDetail?tab=1">Python全栈_网易云课堂</a></li>
+									<li><a href="http://www.runoob.com/java/java-tutorial.html">Java 教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/python/python-tutorial.html">Python 基础教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/">菜鸟教程</a></li>
+									<li><a href="https://www.python-course.eu/index.php">Python外文教程</a></li>
+									<li><a href="https://www.python.org/">Python官网</a></li>
+									<li><a href="https://www.geeksforgeeks.org/">极客的计算机科学门户网站</a></li>	
+									<li><a href="https://www.jianshu.com/p/df7a3f0b4c00">2018尚硅谷资源 - 简书</a></li>
+									<li><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">python第三方库</a></li>
+									<li><a href="http://www.w3school.com.cn/index.html">w3school 在线教程</a></li>
+									<li><a href="http://gaohr.win/">GaoHR</a></li>
+									<li><a href="https://www.csdn.net/">CSDN</a></li>
+									<li><a href="https://www.oracle.com/index.html">Orccle官网</a></li>
+									<li><a href="https://netbeans.org/downloads/8.2/">Netbeans下载网址</a></li>
+									<li><a href="https://developer.mozilla.org/zh-CN/">MDN web学习</a></li>
+									<li><a href="https://dojotoolkit.org/documentation/">Dojo教程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Criminal Geography~~">
+								<ul>
+									<li><a href="https://www.ucrdatatool.gov/Search/Crime/State/RunCrimeOneYearofData.cfm">FBI统一犯罪报告统计</a></li>
+									<li><a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/borough-and-precinct-crime-stats.page#brooklyn">纽约警察局犯罪统计</a></li>
+									<li><a href="https://www.fgdc.gov/HSWG/index.html">紧急符号系统参考</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat.aspx">CrimeStat说明</a></li>
+									<li><a href="https://www.icpsr.umich.edu/CrimeStat/workbook.html">CrimeStat3用户手册</a></li>
+									<li><a href="https://studysites.uk.sagepub.com/bobasantos3e/study/default.htm">SAGE-犯罪分析学生研究网站，第三版</a></li>
+									<li><a href="http://discovery.ucl.ac.uk/11291/1/11291.pdf">外文：犯罪制图-认识犯罪热点</a></li>
+									<li><a href="http://faculty.uml.edu/jbyrne/44.203/Use%20of%20Computerized%20Crime%20Mapping%20by%20Law%20Enforcement.pdf">外文：电子犯罪测绘的应用执法-调查结果</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat-downloads.aspx">CrimeStat材料下载</a></li>
+									<li><a href="https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.0016-7363.2005.00673.x">外文：犯罪制图与统计工程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Geographic data sharing websites~~">
+								<ul>
+									<li><a href="https://www.openstreetmap.org/">openstreetmaps</a></li>
+									<li><a href="http://webmap.cn/main.do?method=index">全国地理信息资源目录服务系统</a></li>
+									<li><a href="https://gisgeography.com/free-global-dem-data-sources/">全球DEM数据获取网站导航</a></li>
+									<li><a href="https://freegisdata.rtwilson.com/">免费GIS数据获取网站导航</a></li>
+									<li><a href="https://ghsl.jrc.ec.europa.eu/">全球人类住区-欧委会</a></li>
+									<li><a href="http://pan.xiaze.org/nj/2015qgrkcydczl/indexch.htm">2015年全国1%人口抽样调查资料</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/ndsj/renkou/2005/renkou.htm">2005年全国1%人口抽样调查数据</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/pcsj/rkpc/6rp/indexch.htm">2010年全国第六次人口普查</a></li>
+									<li><a href="http://www.gscloud.cn/">地理数据云</a></li>
+									<li><a href="https://modis.gsfc.nasa.gov/data/dataprod/mod01.php">MODIS数据获取网站</a></li>
+									<li><a href="http://www.glcf.umd.edu/data/">landset影像下载</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~GIS Learning Websites~~" >
+								<ul>
+									<li><a href="http://contest.esrichina.com.cn/">ESRI大赛</a></li>
+									<li><a href="https://pro.arcgis.com/zh-cn/pro-app/help/analysis/geoprocessing/modelbuilder/modelbuilder-tutorial.htm">模型构建器教程—ArcGIS</a></li>
+									<li><a href="http://ivt.maps.arcgis.com/apps/MapSeries/index.html?appid=9766dba97c954fcaa175da83b72ccf06&adumkts=social&utm_source=social&aduc=social&adum=external&aduSF=facebook&aduca=social_technical&aduco=unlocking_information_imagery_3&aduat=storymap&adbsc=social_20190105_2655151&adbid=6486562228236615680&adbpl=li&adbpr=5311&adbid=10156755029730281&adbpl=fb&adbpr=211211155280">影像在ARCGIS中的应用</a></li>
+									<li><a href="https://www.gislounge.com/">GIS茶间室-地图和GIS</a></li>
+									<li><a href="http://pro.arcgis.com/zh-cn/pro-app/tool-reference/main/arcgis-pro-tool-reference.htm">Arctoolbox</a></li>
+									<li><a href="http://html.rhhz.net/CHXB/html/2017-11-1919.htm">加权泰森多边形文章</a></li>
+									<li><a href="http://zhihu.esrichina.com.cn/">Arcgis知乎</a></li>
+									<li><a href="https://www.nasa.gov/">NASA网</a></li>
+									<li><a href="https://developers.arcgis.com/javascript/">ArcGIS API for JavaScript</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Else  Websites~~" >
+								<ul>
+									<li><a href="https://www.chrome-games.com/">GAME</a></li>
+									<li><a href="http://karuga.eu/2048-3D/">3D2048</a></li>
+									<li><a href="https://www.fbi.gov/">FBI官网</a></li>
+									<li><a href="https://www.gocomics.com/peanuts">花生漫画</a></li>
+									<li><a href="https://link.springer.com/">施普林格</a></li>
+								</ul>
+							</div>
+							
+						</div>
+					</div>
+
+			
+			</div>
+			
+			<!--下子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" style="margin-top: 2px; background-color: honeydew;height: 4%;">
+				<div id="footer">
+					<span>(c) Copyright 2019 Wu Xizhe. All Rights Reserved.</span>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>
+
