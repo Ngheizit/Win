@@ -1,0 +1,32 @@
+.model{
+	width: 90%;
+	border: 4px skyblue solid;
+	background-color: #ddd;
+	margin: 10px auto;
+	padding: 5px 10px;
+	border-bottom-left-radius: 24px;
+	border-bottom-right-radius: 24px;
+}
+.model .title{
+	margin: 1px;
+	color: #333;
+	font-weight: bold;
+	text-align: center;
+	font-size: 22px;
+}
+.model .buttons{
+	text-align: right;
+}
+.model table{
+	margin: 10px 0;
+	color: #222;
+	text-align: center;
+	font-size: 12px;
+	border: 2px #222 solid;
+	border-collapse: collapse;
+}
+.model table td{
+	padding: 2px;
+	border: 1px #222 solid;
+	border-collapse: collapse;
+}
