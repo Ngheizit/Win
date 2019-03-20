@@ -6,6 +6,7 @@
 	margin: 10px;
 }
 #content #title{
+	text-align: center;
 	font-size: 32px;
 	font-weight: bold;
 }
