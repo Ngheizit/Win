@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>ERDAS与ENVI的影像裁切方法汇总</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/BlogsListModel.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/BlogShow.css"/>
+		<link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dojox/layout/resources/FloatingPane.css" />
+		<link rel="stylesheet" type="text/css" href="../css/BlogCSS.css"/>
+		<link rel="stylesheet" type="text/css" href="css/BlogsListModel.css"/>
+		
+		<!--导入页面CSS模板-->
+		<link rel="stylesheet" type="text/css" href="../css/PageTemplate.css"/>
+		
+		<!--
+			BorderContainer容器
+				- 每BorderContainer实例可以至多允许包含5个不同区域
+					-- 上、下、左、右、中
+					-- 若某个区域需进一步分解，则将BorderContainer中的一个区域设置为另一个BorderContainer实例
+				- 通过“design”属性控制其子元素的位置
+					--属性值：
+						--- headline
+							---- 上下两个区域优先设置，且宽度与整个BorderContainer的宽度相同
+							---- 上中下结构
+						--- sidebar
+							---- 左右两个区域优先设置，且高度与整个BorderContainer的高度相同
+							---- 左中右结构
+				- 需要设定宽width 高height (利用CSS样式即可)
+				- 左右子节点可设置宽度
+				- 上下子节点可设置高度
+				- 属性slitter 设置是否可拖拽子节点以修改尺寸
+		-->
+		
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/tundra/tundra.css"/>
+		<link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.9/js/esri/css/esri.css"/>
+		
+		<style type="text/css">
+			html,body,#main{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+			#content img{
+				float: left;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			dojoConfig = {
+				isDebug: true,
+				async: true
+			};
+		</script>
+		
+		<script src="http://js.arcgis.com/3.9/" type="text/javascript"></script>
+		
+		<script type="text/javascript">
+			require(["dojo/parser", "esri/map", "esri/layers/OpenStreetMapLayer", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/domReady!"],function(parser, Map, OpenStreetMapLayer){
+				parser.parse();
+				var map = new Map("mapDiv",{zoom: 4, center: [135, 38]});
+				var agoServiceURL = "http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer";
+				var agoLayer = new OpenStreetMapLayer(agoServiceURL,{
+					displayLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+					
+				});
+				
+				map.addLayer(agoLayer);
+			});
+		</script>
+		<script type="text/javascript">
+			require(["dojo/parser", "dijit/layout/ContentPane", "dijit/form/Button", "dojo/domReady!"], function(parser){
+				parser.parse();
+			});
+		</script>
+		
+	</head>
+	<body class="tundra">
+		
+			
+		<!--BorderContainer容器-->
+		<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false" id="main">
+			
+				
+			<!--上子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'" style="margin-bottom:2px ; background-color: skyblue; background-image: url(../img/headerBackG.jpg); height: 9%;">
+				<div id="header">
+					<img src="../img/WuXZ.png"/>
+					<img id="Snoopy1" src="../img/snoopy01.png"/>
+				</div>
+			</div>
+			
+			<!--左子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="margin-right: 2px; background-color: #EEE; width: 12%;">
+				<div id="leftContent">
+					<img src="../img/个人logo.png"/>
+					<p>🤷Mr.Wu</p>
+					<br />
+					<div id="navigationBar">
+						<ul>
+							<li><a href="../index.html" class="btn-menu" >HOME</a></li>
+							<li style="background-color:  darkred;"><a href="../BlogCatalog.html"  class="btn-menu">BLOGS</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="#"  class="btn-menu">BUILDING</a></li>
+							<li><a href="mailto:ngheizitwu@163.com"  class="btn-menu">TOEMAIL</a></li>
+						</ul>
+					</div>
+					<div id="DENGTING">
+						<img id="DT" src="../img/snoopy02.jpg"/>
+					</div>
+				</div>
+			</div>
+			
+			<!--中子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="background-color: whitesmoke;padding: 10px;">
+				<a href="#title" style="position: fixed;top: 500px;left: 870px;display: block;width: 40px;height: 40px;background-color: #343434;text-align: center;font-size: 22px;line-height: 1.5;">🎈</a>
+				<a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: left;">
+							Back to BlogCatalog
+				</a><br /><br />
+
+				<div id="content">
+					<p id="title">⚓ERDAS与ENVI的影像裁切方法汇总</p>
+					<span id="time">2019年3月23日17点37分</span>
+					<span id="author">Ngheizit</span>
+					<hr />
+
+					<p class="strong1">目录</p>
+					<a href="#t1_1">1.1 基于查询框的裁切</a><br/>
+					<a href="#t1_2">1.2 基于描绘AOI的裁切</a><br/>
+					<a href="#t1_3">1.3 基于矢量数据的裁切</a><br/>
+					<a href="#t2_1">2.1 基于ROI范围的裁切</a><br/>
+					<a href="#t2_2">2.2 基于阈值范围的裁切</a><br/>
+
+					<p class="strong1">1 基于ERDAS软件的影像裁切方法</p>
+					<p class="strong2" id="t1_1">1.1 基于查询框的裁切</p>
+					<img src="DT004P/1 erdas裁切方法1 右击 查询框.PNG" width="300px" />
+					<img src="DT004P/2 erdas裁切方法1 调整查询框位置大小.PNG" width="300px" />
+					<img src="DT004P/3 erdas裁切方法1 裁切设置.PNG" width="500px" />
+					<p class="text">该方式主要利用查询框工具的查询范围进行裁切，裁剪范围限定为矩形。如图，右击调出查询框工具（Inquire box）。然后通过手动或设置参数对查询框进行调整，将其布置到需要裁剪的区域（图）。接着在“DataPrep”模块下选择“Subset Image”裁剪工具，并设置一些列参数，其中“From Inquire Box”按钮是获取查询框的坐标范围，并将其设置为需要裁剪的范围，加上忽略零值统计和设置输出位置后即可完成裁剪（图），效果如图。</p>
+					<img src="DT004P/4 erdas裁切方法1 裁切效果.PNG" width="100px" />
+
+					<p class="strong2 clearfix" id="t1_2">1.2 基于描绘AOI的裁切<p>
+					<p class="text">该方法通过构建AOI范围进行裁剪，与利用查询框裁剪的差别在于范围选择上更为灵活，可以构建描绘不同形状的、随意的范围，即范围选择的自由度更高。</p>
+					<img src="DT004P/5 erdas裁切方法2 调取AOI.PNG" width="300px" />
+					<img src="DT004P/6 erdas裁切方法2 描绘AOI.PNG" />
+					<p class="text">如图，在“AOI”菜单下选择“Tools”调出AOI工具集，然后选择多边形工具描绘出AOI范围（删除AOI范围可通过剪刀工具，AOI范围可以进行保存与导入，操作均在显示框的菜单栏下进行），接着调出“Subset Image”裁剪工具（具体操作查看上一个裁剪方法），在参数选择上点击“AOI”按钮，选择Viewer即可（可选择导入AOI文件），裁剪效果如图。</p>
+					<img src="DT004P/9 erdas裁切方法2 设置裁切范围AOI.PNG" width="500px" />
+					<img src="DT004P/10 erdas裁切方法2 裁切效果.PNG" width="100px" />
+					<p class="text clearfix"> 值得注意的是，以这种方式进行影像裁切的时候，需要对AOI数据进行选定处理，如图是为选定状态的AOI，不记作裁切范围，若要对AOI范围进行裁剪，需单击该AOI范围使其呈现被选定状态。</p>
+					<img src="DT004P/11 erdas裁切方法2 未选择的AOI.PNG" width="150px" />
+
+					<p class="strong2 clearfix" id="t1_3">1.3 基于矢量数据的裁切</p>
+					<img src="DT004P/12 erdas裁切方法3 导入矢量数据并显示面状要素.PNG" width="400px" />
+					<p class="text">该方法是借助于矢量数据，以指定的矢量要素覆盖范围进行裁切。如图，导入矢量数据后（导入方式与导入影像方式类似），选择菜单栏下的Vector菜单的Viewing Properties工具对矢量数据进行可视化面要素处理，然后单击选定需要依照面要素裁剪的区域并在AOI菜单下选择“Copy Selection To AOI”工具生成AOI范围，之后，接下来的裁剪方式就与基于AOI裁剪的操作一样了，效果如图。</p>
+					<img src="DT004P/13 erdas裁切方法3 选择裁切的面状要素并设置未AOI.PNG" width="400px" />
+					<img src="DT004P/15 erdas裁切方法3 裁切效果.PNG" width="100px" />
+					<p class="text clearfix">还有，在加载一些不规则形状的影像时，可在导入时通过“Raster Options”下设置透明背景。</p>
+					<img src="DT004P/14 erdas消除影响黑色背景.PNG" width="300px" />
+
+					<p class="strong1 clearfix">2 基于ENVI软件的影像裁切方法</p>
+					<p class="strong2" id="t2_1">2.1 基于ROI范围的裁切</p>
+					<img src="DT004P/16 envi裁切方法1 调出ROI.PNG" width="300px" />
+					<p class="text">在ENVI软件里，ROI类似与ERDAS软件里的AOI，均是通过手动描绘出一个范围，然后根据该范围进行裁切。如图，在ENVI软件里，ROI工具通过菜单栏下“Basic Tools”菜单的“Region Of Interest”的“ROI Tool”调出。</p>
+					<img src="DT004P/17 envi裁切方法1 描绘ROI.PNG" width="300px" />
+					<img src="DT004P/18 envi裁切方法1 保存ROI.PNG" width="300px" />
+					<img src="DT004P/19 envi裁切方法1 调出裁切工具.PNG" width="300px" />
+					<p class="text">"ROI Tool"工具可以“Window”属性中选择需要进行描绘的指定视图，下部分区域可以进行新建ROI对象或删除ROI对象。在描绘ROI范围完成之后（可在菜单栏下的“File”菜单的“Save ROIs”对进行了描绘的ROI数据保存），可选择菜单栏下“Basic Tool”的“Subset  Data via ROIs”工具进行指定图层的裁切。才参数设置中，需要选择指定裁切的ROI以及在“Mask pixels outside of ROI?”中选择“Yes”并且对“Mask Background Value”设置为“NaN”，最后选择输出路径即可，裁切效果如图。</p>
+					<img src="DT004P/20 envi裁切方法1 选择裁切对象.PNG" width="300px" />
+					<img src="DT004P/21 envi裁切方法1 裁切参数设置.PNG" width="300px" />
+					<img src="DT004P/22 envi裁切方法1 裁切效果.PNG" width="100px" />
+					
+					<p class="strong1 clearfix" id="t2_2">2.2 基于阈值范围的裁切</p>
+					<p class="text">基于阈值范围裁切的原理是以影像中指定波段范围作为裁剪的范围进行裁切。接下来以提取彩虹外影像中的NDVI（标准差异植被指数），并提取NDVI值中的一定阈值范围作为裁剪范围进行裁切。</p>
+					<img src="DT004P/23 envi裁切方法2 调出NDVI.PNG" width="300px" />
+					<img src="DT004P/24 envi裁切方法2 选择对象测NDVI.PNG" width="300px" />
+					<img src="DT004P/25 envi裁切方法2 NDVI参数设置.PNG" />
+					<img src="DT004P/26 envi裁切方法2 NDVI效果.PNG" width="300px" />
+					<p class="text">如图，首先在菜单“Transform”下调出计算NDVI的工具并选择需要计算的影像，在参数选择上根据不同的传感器进行设置，这里设置为Landset的TM传感器，计算波段为第3波段和第4波段（ NDVI=(red-nir)/(red+nir) ），选择输出路径然后即可生成NDVI数据。</p>
+					<img src="DT004P/25 envi裁切方法2 NDVI参数设置.PNG" width="200px" />
+					<img src="DT004P/28 envi裁切方法2 通过波长阈值设ROI.PNG" width="250px" />
+					<img src="DT004P/29 envi裁切方法2 选择阈值范围.PNG" width="190px" />
+					<img src="DT004P/27 envi裁切方法2 波长阈值获取对象.PNG"  width="200px" />
+					<p class="text clearfix">接着，在“Options”菜单下选择“Band Threshold to ROI”工具，参数设置阈值的最大值和最小值（可通过右击NDVI数据选择“Quick Stat”工具查看），即可获得通过阈值设置的ROI范围，接下来的操作就类似基于ROI裁切的方法进行裁切操作，效果如图。</p>
+					<img src="DT004P/32 envi裁切方法2 查看NDVI范围.PNG"  width="300px" />
+					<img src="DT004P/30 envi裁切方法2 阈值ROI效果.PNG"  width="300px" />
+					<img src="DT004P/31 envi裁切方法2 裁切效果.PNG"  width="200px" />
+
+				</div>
+				
+
+
+
+
+
+				
+				
+				
+				
+				
+					
+				<a href="../BlogCatalog.html"  class="blogsList" style="width: 200px;text-align: center;font-weight:bold;float: right;">
+							Back to BlogCatalog
+				</a>
+				 
+				
+			</div>
+			
+			<!--右子节点   堆叠容器-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="background-color: beige;width: 30%;">
+				
+
+					
+					<div data-dojo-type="dijit/layout/ContentPane" title="My Share" style="background-color: #333">
+						
+						<div id="rightContent" data-dojo-type="dijit/layout/AccordionContainer" style="padding: 0;overflow: hidden;z-index: 29;">
+							
+												
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Personally Used Websites~~">
+								<ul>
+									<li><a href="https://g3.luciaz.me/">Google Search</a></li>
+									<li><a href="https://translate.google.cn/">Google Translate</a></li>
+									<li><a href="https://github.com/">GitHub</a></li>
+									<li><a href="https://en.wikipedia.org/wiki/Wikipedia">Wikipedia</a></li>
+									<li><a href="http://mail.163.com/js6/main.jsp?sid=wCosRfXjyqeoXrgzdYjjcnHbCbAzztVX&df=unknow#module=welcome.WelcomeModule%7C%7B%7D">163email</a></li>
+									<li><a href="http://www.cnki.net/">中国知网</a></li>
+									<li><a href="http://www.hebtu.edu.cn/">河北师大</a></li>
+									<li><a href="https://www.12306.cn/index/">12306</a></li>
+									<li><a href="http://ac.scmor.com/">谷歌镜像1</a></li>
+									<li><a href="https://vvp0.499994.xyz/googlebak.html">谷歌镜像2</a></li>
+								</ul>				
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Programming Tutorial Websites~~">
+								<ul>									
+									<li><a href="https://unbug.github.io/codelf/#%E5%AF%B9%E8%A7%92%E7%9F%A9%E9%98%B5">标识符命名智能查询</a></li>
+									<li><a href="https://study.163.com/course/courseMain.htm?courseId=1004987028&_trace_c_p_k2_=0469f8e885924c06a3c0e584af85cad9#/courseDetail?tab=1">Python全栈_网易云课堂</a></li>
+									<li><a href="http://www.runoob.com/java/java-tutorial.html">Java 教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/python/python-tutorial.html">Python 基础教程 | 菜鸟教程</a></li>
+									<li><a href="http://www.runoob.com/">菜鸟教程</a></li>
+									<li><a href="https://www.python-course.eu/index.php">Python外文教程</a></li>
+									<li><a href="https://www.python.org/">Python官网</a></li>
+									<li><a href="https://www.geeksforgeeks.org/">极客的计算机科学门户网站</a></li>	
+									<li><a href="https://www.jianshu.com/p/df7a3f0b4c00">2018尚硅谷资源 - 简书</a></li>
+									<li><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">python第三方库</a></li>
+									<li><a href="http://www.w3school.com.cn/index.html">w3school 在线教程</a></li>
+									<li><a href="http://gaohr.win/">GaoHR</a></li>
+									<li><a href="https://www.csdn.net/">CSDN</a></li>
+									<li><a href="https://www.oracle.com/index.html">Orccle官网</a></li>
+									<li><a href="https://netbeans.org/downloads/8.2/">Netbeans下载网址</a></li>
+									<li><a href="https://developer.mozilla.org/zh-CN/">MDN web学习</a></li>
+									<li><a href="https://dojotoolkit.org/documentation/">Dojo教程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Criminal Geography~~">
+								<ul>
+									<li><a href="https://www.ucrdatatool.gov/Search/Crime/State/RunCrimeOneYearofData.cfm">FBI统一犯罪报告统计</a></li>
+									<li><a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/borough-and-precinct-crime-stats.page#brooklyn">纽约警察局犯罪统计</a></li>
+									<li><a href="https://www.fgdc.gov/HSWG/index.html">紧急符号系统参考</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat.aspx">CrimeStat说明</a></li>
+									<li><a href="https://www.icpsr.umich.edu/CrimeStat/workbook.html">CrimeStat3用户手册</a></li>
+									<li><a href="https://studysites.uk.sagepub.com/bobasantos3e/study/default.htm">SAGE-犯罪分析学生研究网站，第三版</a></li>
+									<li><a href="http://discovery.ucl.ac.uk/11291/1/11291.pdf">外文：犯罪制图-认识犯罪热点</a></li>
+									<li><a href="http://faculty.uml.edu/jbyrne/44.203/Use%20of%20Computerized%20Crime%20Mapping%20by%20Law%20Enforcement.pdf">外文：电子犯罪测绘的应用执法-调查结果</a></li>
+									<li><a href="https://www.nij.gov/topics/technology/maps/pages/crimestat-downloads.aspx">CrimeStat材料下载</a></li>
+									<li><a href="https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.0016-7363.2005.00673.x">外文：犯罪制图与统计工程</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Geographic data sharing websites~~">
+								<ul>
+									<li><a href="https://www.openstreetmap.org/">openstreetmaps</a></li>
+									<li><a href="http://webmap.cn/main.do?method=index">全国地理信息资源目录服务系统</a></li>
+									<li><a href="https://gisgeography.com/free-global-dem-data-sources/">全球DEM数据获取网站导航</a></li>
+									<li><a href="https://freegisdata.rtwilson.com/">免费GIS数据获取网站导航</a></li>
+									<li><a href="https://ghsl.jrc.ec.europa.eu/">全球人类住区-欧委会</a></li>
+									<li><a href="http://pan.xiaze.org/nj/2015qgrkcydczl/indexch.htm">2015年全国1%人口抽样调查资料</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/ndsj/renkou/2005/renkou.htm">2005年全国1%人口抽样调查数据</a></li>
+									<li><a href="http://www.stats.gov.cn/tjsj/pcsj/rkpc/6rp/indexch.htm">2010年全国第六次人口普查</a></li>
+									<li><a href="http://www.gscloud.cn/">地理数据云</a></li>
+									<li><a href="https://modis.gsfc.nasa.gov/data/dataprod/mod01.php">MODIS数据获取网站</a></li>
+									<li><a href="http://www.glcf.umd.edu/data/">landset影像下载</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~GIS Learning Websites~~" >
+								<ul>
+									<li><a href="http://contest.esrichina.com.cn/">ESRI大赛</a></li>
+									<li><a href="https://pro.arcgis.com/zh-cn/pro-app/help/analysis/geoprocessing/modelbuilder/modelbuilder-tutorial.htm">模型构建器教程—ArcGIS</a></li>
+									<li><a href="http://ivt.maps.arcgis.com/apps/MapSeries/index.html?appid=9766dba97c954fcaa175da83b72ccf06&adumkts=social&utm_source=social&aduc=social&adum=external&aduSF=facebook&aduca=social_technical&aduco=unlocking_information_imagery_3&aduat=storymap&adbsc=social_20190105_2655151&adbid=6486562228236615680&adbpl=li&adbpr=5311&adbid=10156755029730281&adbpl=fb&adbpr=211211155280">影像在ARCGIS中的应用</a></li>
+									<li><a href="https://www.gislounge.com/">GIS茶间室-地图和GIS</a></li>
+									<li><a href="http://pro.arcgis.com/zh-cn/pro-app/tool-reference/main/arcgis-pro-tool-reference.htm">Arctoolbox</a></li>
+									<li><a href="http://html.rhhz.net/CHXB/html/2017-11-1919.htm">加权泰森多边形文章</a></li>
+									<li><a href="http://zhihu.esrichina.com.cn/">Arcgis知乎</a></li>
+									<li><a href="https://www.nasa.gov/">NASA网</a></li>
+									<li><a href="https://developers.arcgis.com/javascript/">ArcGIS API for JavaScript</a></li>
+								</ul>
+							</div>
+							
+							<div data-dojo-type="dijit/layout/ContentPane" title="~~Else  Websites~~" >
+								<ul>
+									<li><a href="https://www.chrome-games.com/">GAME</a></li>
+									<li><a href="http://karuga.eu/2048-3D/">3D2048</a></li>
+									<li><a href="https://www.fbi.gov/">FBI官网</a></li>
+									<li><a href="https://www.gocomics.com/peanuts">花生漫画</a></li>
+									<li><a href="https://link.springer.com/">施普林格</a></li>
+								</ul>
+							</div>
+							
+						</div>
+					</div>
+
+			
+			</div>
+			
+			<!--下子节点-->
+			<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom'" style="margin-top: 2px; background-color: honeydew;height: 4%;">
+				<div id="footer">
+					<span>(c) Copyright 2019 Wu Xizhe. All Rights Reserved.</span>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>
+
